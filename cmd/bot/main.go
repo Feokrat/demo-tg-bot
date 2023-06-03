@@ -22,7 +22,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	bot.Debug = true
+	bot.Debug = false
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -32,12 +32,35 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("User %v wrote message: %v", update.Message.From.UserName, update.Message.Text))
-
-			bot.Send(msg)
+		if update.Message == nil { // If we got a message
+			continue
 		}
+
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+		switch update.Message.Command() {
+		case "help":
+			processHelp(bot, update.Message)
+		case "love":
+			processLove(bot, update.Message)
+		default:
+			defaultBehaviour(bot, update.Message)
+		}
+
 	}
+}
+
+func processHelp(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
+	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("Sry, can't help you, %v", message.Chat.UserName))
+	bot.Send(msg)
+}
+
+func processLove(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
+	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("I love you, %v", message.Chat.UserName))
+	bot.Send(msg)
+}
+
+func defaultBehaviour(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
+	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("User %v wrote message: %v", message.Chat.UserName, message.Text))
+	bot.Send(msg)
 }
