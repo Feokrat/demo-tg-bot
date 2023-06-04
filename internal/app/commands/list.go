@@ -6,7 +6,7 @@ import (
 
 func (c *Commander) List(message *tgbotapi.Message) {
 	outputMessageText := "All products: \n\n"
-	products := c.produuctService.List()
+	products := c.productService.List()
 
 	for _, p := range products {
 		outputMessageText += p.Title + "\n"

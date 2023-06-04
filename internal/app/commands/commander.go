@@ -6,13 +6,13 @@ import (
 )
 
 type Commander struct {
-	bot             *tgbotapi.BotAPI
-	produuctService *product.Service
+	bot            *tgbotapi.BotAPI
+	productService *product.Service
 }
 
 func NewCommander(bot *tgbotapi.BotAPI, productService *product.Service) *Commander {
 	return &Commander{
-		bot:             bot,
-		produuctService: productService,
+		bot:            bot,
+		productService: productService,
 	}
 }
