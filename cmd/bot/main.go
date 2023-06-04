@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
+	"github.com/Feokrat/demo-tg-bot/internal/app/commands"
 	"github.com/Feokrat/demo-tg-bot/internal/service/product"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
@@ -31,9 +31,10 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	productService := product.NewService()
+	commander := commands.NewCommander(bot, productService)
 
 	for update := range updates {
-		if update.Message == nil { // If we got a message
+		if update.Message == nil {
 			continue
 		}
 
@@ -41,44 +42,13 @@ func main() {
 
 		switch update.Message.Command() {
 		case "help":
-			processHelp(bot, update.Message)
+			commander.Help(update.Message)
 		case "love":
-			processLove(bot, update.Message)
+			commander.Love(update.Message)
 		case "list":
-			processList(bot, update.Message, productService)
+			commander.List(update.Message)
 		default:
-			defaultBehaviour(bot, update.Message)
+			commander.Default(update.Message)
 		}
-
 	}
-}
-
-func processHelp(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf(
-		"/help - help\n"+
-			"/list - list something\n"+
-			"/love - get love"))
-	bot.Send(msg)
-}
-
-func processLove(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("I love you, %v", message.Chat.UserName))
-	bot.Send(msg)
-}
-
-func processList(bot *tgbotapi.BotAPI, message *tgbotapi.Message, productService *product.Service) {
-	outputMessageText := "All products: \n\n"
-	products := productService.List()
-
-	for _, p := range products {
-		outputMessageText += p.Title + "\n"
-	}
-
-	msg := tgbotapi.NewMessage(message.Chat.ID, outputMessageText)
-	bot.Send(msg)
-}
-
-func defaultBehaviour(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("User %v wrote message: %v", message.Chat.UserName, message.Text))
-	bot.Send(msg)
 }

@@ -7,6 +7,6 @@ func NewService() *Service {
 	return &Service{}
 }
 
-func(*Service) List() []Product {
+func (*Service) List() []Product {
 	return allProducts
 }
