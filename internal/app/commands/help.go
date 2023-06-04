@@ -10,6 +10,7 @@ func (c *Commander) Help(message *tgbotapi.Message) {
 	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf(
 		"/help - help\n"+
 			"/list - list something\n"+
-			"/love - get love"))
+			"/love - get love\n"+
+			"/get <n> - get n'th product"))
 	c.bot.Send(msg)
 }
